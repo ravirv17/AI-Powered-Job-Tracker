@@ -14,6 +14,9 @@ import {
   Chip,
   Stack,
   Divider,
+  Tabs,
+  Tab,
+  Tooltip as MuiTooltip,
 } from "@mui/material";
 import {
   Bar,
@@ -76,6 +79,7 @@ function saveResume(text: string) {
 export const App = () => {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [filterStatus, setFilterStatus] = useState<Status | "All">("All");
+  const [activeTab, setActiveTab] = useState<"pipeline" | "ai">("pipeline");
 
   const [form, setForm] = useState<Omit<JobApplication, "id">>({
     company: "",
@@ -186,7 +190,13 @@ export const App = () => {
   return (
     <>
       <CssBaseline />
-      <Box sx={{ minHeight: "100vh", bgcolor: "#0b1120", py: 4 }}>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "radial-gradient(circle at top, #1d2538 0, #020617 55%, #000 100%)",
+          py: 4,
+        }}
+      >
         <Container maxWidth="lg">
           <Typography
             variant="h4"
@@ -194,28 +204,64 @@ export const App = () => {
           >
             AI-Powered Job Tracker
           </Typography>
-          <Typography sx={{ mb: 4, color: "#9ca3af" }}>
-            Add and track job applications, visualize your pipeline, store your
-            resume, and get AI-powered suggestions for your job search.
+          <Typography sx={{ mb: 3, color: "#9ca3af", maxWidth: 720 }}>
+            Add and track job applications, see a clear pipeline view with analytics,
+            store your resume, and get AI-powered guidance tailored to your profile.
           </Typography>
 
-          <Box
+          <Paper
+            elevation={4}
             sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "2fr 1.5fr" },
-              gap: 3,
               mb: 3,
+              borderRadius: 3,
+              bgcolor: "rgba(15,23,42,0.9)",
+              border: "1px solid rgba(148,163,184,0.2)",
+              backdropFilter: "blur(18px)",
             }}
           >
-            <Paper
-              elevation={3}
-              sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
+            <Tabs
+              value={activeTab}
+              onChange={(_, value) => setActiveTab(value)}
+              textColor="inherit"
+              TabIndicatorProps={{ sx: { bgcolor: "#6366f1" } }}
+              variant="fullWidth"
             >
+              <Tab
+                value="pipeline"
+                label="Applications & Analytics"
+                sx={{ textTransform: "none", fontWeight: 600 }}
+              />
+              <Tab
+                value="ai"
+                label="Resume & AI Coach"
+                sx={{ textTransform: "none", fontWeight: 600 }}
+              />
+            </Tabs>
+          </Paper>
+
+          {activeTab === "pipeline" && (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "2.1fr 1.6fr" },
+                gap: 3,
+                mb: 3,
+              }}
+            >
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 3,
+                  bgcolor: "#020617",
+                  borderRadius: 3,
+                  border: "1px solid rgba(30,64,175,0.6)",
+                }}
+              >
               <Typography
                 variant="h6"
                 sx={{ mb: 2, fontWeight: 600, color: "#e5e7eb" }}
               >
-                Add Application
+                Application details
               </Typography>
 
               <Box
@@ -363,111 +409,116 @@ export const App = () => {
                   </Button>
                 </Box>
               </Box>
-            </Paper>
+              </Paper>
 
-            <Paper
-              elevation={3}
-              sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ mb: 2, fontWeight: 600, color: "#e5e7eb" }}
+              <Paper
+                elevation={3}
+                sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
               >
-                Resume & AI Suggestions
-              </Typography>
-
-              <TextField
-                label="Resume (paste text)"
-                value={resumeText}
-                onChange={(e) => setResumeText(e.target.value)}
-                multiline
-                minRows={4}
-                fullWidth
-                sx={{
-                  mb: 2,
-                  "& .MuiOutlinedInput-root": {
-                    color: "#e5e7eb",
-                  },
-                }}
-                InputLabelProps={{ sx: { color: "#9ca3af" } }}
-              />
-
-              <TextField
-                label="Job description (optional)"
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                multiline
-                minRows={3}
-                fullWidth
-                sx={{
-                  mb: 2,
-                  "& .MuiOutlinedInput-root": {
-                    color: "#e5e7eb",
-                  },
-                }}
-                InputLabelProps={{ sx: { color: "#9ca3af" } }}
-              />
-
-              <Button
-                variant="contained"
-                onClick={handleGetSuggestions}
-                disabled={aiLoading}
-                sx={{
-                  mb: 2,
-                  bgcolor: "#22c55e",
-                  textTransform: "none",
-                  "&:hover": { bgcolor: "#16a34a" },
-                }}
-              >
-                {aiLoading ? "Getting suggestions..." : "Get AI Suggestions"}
-              </Button>
-
-              {aiError && (
-                <Typography sx={{ color: "#f97373", mb: 1 }}>
-                  {aiError}
-                </Typography>
-              )}
-
-              {aiSuggestions && (
-                <Paper
-                  variant="outlined"
-                  sx={{
-                    mt: 1,
-                    p: 2,
-                    maxHeight: 260,
-                    overflowY: "auto",
-                    bgcolor: "#020617",
-                    borderColor: "#1f2937",
-                  }}
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 1.5, fontWeight: 600, color: "#e5e7eb" }}
                 >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ mb: 1, color: "#9ca3af" }}
-                  >
-                    AI Suggestions
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ whiteSpace: "pre-wrap", color: "#e5e7eb" }}
-                  >
-                    {aiSuggestions}
-                  </Typography>
-                </Paper>
-              )}
-            </Paper>
-          </Box>
+                  Quick pipeline summary
+                </Typography>
+                <Typography sx={{ mb: 2, color: "#9ca3af", fontSize: 13 }}>
+                  Use this as your daily snapshot: how many applications are in each
+                  stage, and how your volume is trending over time.
+                </Typography>
 
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "2fr 1.5fr" },
-              gap: 3,
-            }}
-          >
-            <Paper
-              elevation={3}
-              sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ mb: 2, flexWrap: "wrap" }}
+                >
+                  <Chip
+                    label={`Total: ${applications.length}`}
+                    sx={{
+                      bgcolor: "#111827",
+                      color: "#e5e7eb",
+                    }}
+                  />
+                  {STATUSES.map((status) => {
+                    const label = `${status}: ${
+                      applications.filter((a) => a.status === status).length
+                    }`;
+                    const colorMap: Record<Status, string> = {
+                      Applied: "#6366f1",
+                      Interview: "#22c55e",
+                      Offer: "#eab308",
+                      Rejected: "#f97373",
+                    };
+                    return (
+                      <Chip
+                        key={status}
+                        label={label}
+                        sx={{
+                          bgcolor: "#111827",
+                          color: colorMap[status],
+                          border: `1px solid ${colorMap[status]}33`,
+                        }}
+                      />
+                    );
+                  })}
+                </Stack>
+
+                <Divider sx={{ my: 2, borderColor: "#1f2937" }} />
+
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 1, color: "#9ca3af" }}
+                >
+                  Applications by status
+                </Typography>
+                <Box sx={{ height: 190 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analyticsByStatus}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                      <XAxis dataKey="status" stroke="#9ca3af" />
+                      <YAxis allowDecimals={false} stroke="#9ca3af" />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="count" fill="#6366f1" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Box>
+
+                <Divider sx={{ my: 2, borderColor: "#1f2937" }} />
+
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 1, color: "#9ca3af" }}
+                >
+                  Applications over time
+                </Typography>
+                <Box sx={{ height: 190 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analyticsByMonth}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                      <XAxis dataKey="month" stroke="#9ca3af" />
+                      <YAxis allowDecimals={false} stroke="#9ca3af" />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="count" name="Applications" fill="#22c55e" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Box>
+              </Paper>
+            </Box>
+          )}
+
+          {activeTab === "pipeline" && (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1.9fr 1.1fr" },
+                gap: 3,
+              }}
             >
+              <Paper
+                elevation={3}
+                sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
+              >
               <Box
                 sx={{
                   display: "flex",
@@ -480,7 +531,7 @@ export const App = () => {
                   variant="h6"
                   sx={{ fontWeight: 600, color: "#e5e7eb" }}
                 >
-                  Applications
+                  Application list
                 </Typography>
                 <FormControl size="small">
                   <InputLabel sx={{ color: "#9ca3af" }}>Filter</InputLabel>
@@ -525,7 +576,7 @@ export const App = () => {
                           alignItems: "flex-start",
                         }}
                       >
-                        <Box>
+                        <Box sx={{ pr: 1.5 }}>
                           <Typography
                             sx={{
                               fontWeight: 600,
@@ -572,8 +623,8 @@ export const App = () => {
                             </Typography>
                           )}
                         </Box>
-                        <Stack spacing={1} alignItems="flex-end">
-                          <FormControl size="small">
+                        <Stack spacing={1} alignItems="flex-end" minWidth={150}>
+                          <FormControl size="small" fullWidth>
                             <Select
                               value={app.status}
                               onChange={(e) =>
@@ -591,100 +642,179 @@ export const App = () => {
                               ))}
                             </Select>
                           </FormControl>
-                          <Button
-                            size="small"
-                            color="error"
-                            onClick={() => handleDelete(app.id)}
-                            sx={{ textTransform: "none", fontSize: 12 }}
-                          >
-                            Remove
-                          </Button>
+                          <MuiTooltip title="Remove this application">
+                            <Button
+                              size="small"
+                              color="error"
+                              onClick={() => handleDelete(app.id)}
+                              sx={{ textTransform: "none", fontSize: 12 }}
+                            >
+                              Remove
+                            </Button>
+                          </MuiTooltip>
                         </Stack>
                       </Box>
                     </Paper>
                   ))}
                 </Stack>
               )}
-            </Paper>
+              </Paper>
 
-            <Paper
-              elevation={3}
-              sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
+              <Paper
+                elevation={3}
+                sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ mb: 1.5, fontWeight: 600, color: "#e5e7eb" }}
+                >
+                  How to read this page
+                </Typography>
+                <Typography sx={{ color: "#9ca3af", fontSize: 13, mb: 1 }}>
+                  1. Add every job you apply for on the left.
+                </Typography>
+                <Typography sx={{ color: "#9ca3af", fontSize: 13, mb: 1 }}>
+                  2. Update the status as you move through interviews, offers, or
+                  rejections.
+                </Typography>
+                <Typography sx={{ color: "#9ca3af", fontSize: 13, mb: 1 }}>
+                  3. Use the summary and charts above to monitor whether you are
+                  sending enough applications and how far they progress.
+                </Typography>
+                <Typography sx={{ color: "#6b7280", fontSize: 12, mt: 1 }}>
+                  Tip: Filter by status (top-right of the list) to focus on one stage
+                  at a time, e.g. only open interviews.
+                </Typography>
+              </Paper>
+            </Box>
+          )}
+
+          {activeTab === "ai" && (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1.4fr 1.6fr" },
+                gap: 3,
+              }}
             >
-              <Typography
-                variant="h6"
-                sx={{ mb: 2, fontWeight: 600, color: "#e5e7eb" }}
+              <Paper
+                elevation={3}
+                sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
               >
-                Analytics
-              </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 1.5, fontWeight: 600, color: "#e5e7eb" }}
+                >
+                  Resume workspace
+                </Typography>
+                <Typography sx={{ mb: 2, color: "#9ca3af", fontSize: 13 }}>
+                  Paste your resume text here. It is stored only in your browser
+                  (localStorage) and never sent anywhere unless you request AI
+                  suggestions.
+                </Typography>
 
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{ mb: 2, flexWrap: "wrap" }}
-              >
-                <Chip
-                  label={`Total: ${applications.length}`}
+                <TextField
+                  label="Resume (paste text)"
+                  value={resumeText}
+                  onChange={(e) => setResumeText(e.target.value)}
+                  multiline
+                  minRows={8}
+                  fullWidth
                   sx={{
-                    bgcolor: "#111827",
-                    color: "#e5e7eb",
-                  }}
-                />
-                {STATUSES.map((status) => (
-                  <Chip
-                    key={status}
-                    label={`${status}: ${
-                      applications.filter((a) => a.status === status).length
-                    }`}
-                    sx={{
-                      bgcolor: "#111827",
+                    mb: 2,
+                    "& .MuiOutlinedInput-root": {
                       color: "#e5e7eb",
-                    }}
-                  />
-                ))}
-              </Stack>
+                    },
+                  }}
+                  InputLabelProps={{ sx: { color: "#9ca3af" } }}
+                />
 
-              <Typography
-                variant="subtitle2"
-                sx={{ mb: 1, color: "#9ca3af" }}
+                <TextField
+                  label="Target job description (optional)"
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  multiline
+                  minRows={4}
+                  fullWidth
+                  sx={{
+                    mb: 2,
+                    "& .MuiOutlinedInput-root": {
+                      color: "#e5e7eb",
+                    },
+                  }}
+                  InputLabelProps={{ sx: { color: "#9ca3af" } }}
+                />
+
+                <MuiTooltip title="Uses your OpenAI API key on the backend">
+                  <span>
+                    <Button
+                      variant="contained"
+                      onClick={handleGetSuggestions}
+                      disabled={aiLoading}
+                      sx={{
+                        mb: 1,
+                        bgcolor: "#22c55e",
+                        textTransform: "none",
+                        "&:hover": { bgcolor: "#16a34a" },
+                      }}
+                    >
+                      {aiLoading ? "Getting suggestions..." : "Get AI Suggestions"}
+                    </Button>
+                  </span>
+                </MuiTooltip>
+
+                {aiError && (
+                  <Typography sx={{ color: "#f97373", mt: 1 }}>
+                    {aiError}
+                  </Typography>
+                )}
+              </Paper>
+
+              <Paper
+                elevation={3}
+                sx={{ p: 3, bgcolor: "#020617", borderRadius: 3 }}
               >
-                Applications by status
-              </Typography>
-              <Box sx={{ height: 200 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analyticsByStatus}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                    <XAxis dataKey="status" stroke="#9ca3af" />
-                    <YAxis allowDecimals={false} stroke="#9ca3af" />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" fill="#6366f1" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 1.5, fontWeight: 600, color: "#e5e7eb" }}
+                >
+                  AI career coach
+                </Typography>
+                <Typography sx={{ mb: 2, color: "#9ca3af", fontSize: 13 }}>
+                  You&apos;ll get three things: a short summary of your profile,
+                  concrete resume improvements, and 3 next actions for your job
+                  search.
+                </Typography>
 
-              <Divider sx={{ my: 2, borderColor: "#1f2937" }} />
-
-              <Typography
-                variant="subtitle2"
-                sx={{ mb: 1, color: "#9ca3af" }}
-              >
-                Applications over time
-              </Typography>
-              <Box sx={{ height: 200 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analyticsByMonth}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                    <XAxis dataKey="month" stroke="#9ca3af" />
-                    <YAxis allowDecimals={false} stroke="#9ca3af" />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" name="Applications" fill="#22c55e" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            </Paper>
-          </Box>
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    maxHeight: 420,
+                    overflowY: "auto",
+                    bgcolor: "#020617",
+                    borderColor: "#1f2937",
+                  }}
+                >
+                  {aiSuggestions ? (
+                    <Typography
+                      variant="body2"
+                      sx={{ whiteSpace: "pre-wrap", color: "#e5e7eb" }}
+                    >
+                      {aiSuggestions}
+                    </Typography>
+                  ) : (
+                    <Typography
+                      sx={{ color: "#6b7280", fontSize: 13, textAlign: "center" }}
+                    >
+                      Run an AI suggestion to see feedback on your resume and strategy
+                      here.
+                    </Typography>
+                  )}
+                </Paper>
+              </Paper>
+            </Box>
+          )}
         </Container>
       </Box>
     </>
